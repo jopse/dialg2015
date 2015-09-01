@@ -1,4 +1,6 @@
-package dinalg2015;
+package dinalg2015EstherJose;
+
+import java.util.HashMap;
 
 /**
  * Clase QueryDepotTree. Implementa QueryDepot para la implementación por árboles.
@@ -8,14 +10,17 @@ package dinalg2015;
  */
 public class QueryDepotTree implements QueryDepot 
 {
-    public Trie qDepot;
+    public HashMap<String,Trie<Query>> qDepot;
     public int num;
     
     /**
      * Constructor
      */
     public QueryDepotTree() {
-	
+	String vocabulario = "abcdefghijklmnñopqrstuvwxyz";
+	for (int i=0;i<vocabulario.length();i++){
+	    qDepot.put(vocabulario.substring(i, i), new Trie<Query>(new NodoTrie<Query>(vocabulario.charAt(i),null),0));
+	}
     }
 
     /** Devuelve el número de consultas diferentes (sin contar repeticiones) 
@@ -23,7 +28,7 @@ public class QueryDepotTree implements QueryDepot
      * @returns el número de consultas diferentes almacenadas
      */
     public int numQueries() {
-	return 0;
+	return num;
     }
     
     /** Consulta la frecuencia de una consulta en el depósito
@@ -31,7 +36,13 @@ public class QueryDepotTree implements QueryDepot
      * @param el texto de la consulta
      */
     public int getFreqQuery (String q) {
-	return 0;
+	String letterAux = q.substring(0,0);
+	Trie<Query> trieAux = qDepot.get(letterAux);
+	Query qAux = trieAux.buscar(q);
+	if (qAux == null){
+		return 0;
+	}
+	return qAux.getFreq();
     }
 
     /** Dado un prefijo de consulta, devuelve una lista, ordenada por
@@ -41,8 +52,11 @@ public class QueryDepotTree implements QueryDepot
      * lexicográfico en caso de coincidencia de frecuencia
      * @param el prefijo
      */
-    public ListIF<Query> listOfQueries (String prefix) {
-	return null;
+    public Lista<Query> listOfQueries (String prefix) {
+	String letterAux = prefix.substring(0,0);
+	Trie<Query> trieAux = qDepot.get(letterAux);
+	Lista<Query> listOfQueries = trieAux.buscarPorPrefijo(prefix);
+	return listOfQueries;
     }
 
     /** Incrementa en uno la frecuencia de una consulta en el depósito
@@ -50,6 +64,22 @@ public class QueryDepotTree implements QueryDepot
      * @param el texto de la consulta
      */
     public void incFreqQuery (String q) {
+	String letterAux = q.substring(0,0);
+	Trie<Query> trieAux = qDepot.get(letterAux);
+	Query qAux = trieAux.buscar(q);
+	if (qAux==null){
+	    try {
+		trieAux.insertar(new Query(q));
+	    } catch (ElementoExisteException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } catch (PalabraInvalidaException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}else{
+	    trieAux.buscar(q).setQueryFreq(qAux.getQueryFreq()+1);
+	}
     }
 
     /** Decrementa en uno la frecuencia de una consulta en el depósito
@@ -59,6 +89,22 @@ public class QueryDepotTree implements QueryDepot
      * @param el texto de la consulta
      */
     public void decFreqQuery (String q) {
+	String letterAux = q.substring(0,0);
+	Trie<Query> trieAux = qDepot.get(letterAux);
+	Query qAux = trieAux.buscar(q);
+	qAux.setQueryFreq(qAux.getQueryFreq()-1);
+	trieAux.buscar(q).setQueryFreq(qAux.getQueryFreq());
+	if (qAux.getQueryFreq()==0){
+	    try {
+		trieAux.eliminar(q);
+	    } catch (ElementoNoExisteException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } catch (PalabraInvalidaException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
 	
     }
 }
