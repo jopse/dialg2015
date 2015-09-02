@@ -12,8 +12,8 @@ public class Query {
     
     /** Construye una nueva query con el texto pasado como parámetro */
     public Query (String text) {
-        this.setQueryText(text);
-        this.setQueryFreq(1);
+	this.queryText=text;
+	this.queryFreq=1;
     }
     
     /** Modifica la frecuencia de la query */
@@ -59,5 +59,9 @@ public class Query {
      */
     public void setQueryFreq(int queryFreq) {
 	this.queryFreq = queryFreq;
+    }
+    @Override
+    public String toString(){
+	return this.queryText;
     }
 }

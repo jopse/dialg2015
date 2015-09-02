@@ -40,7 +40,7 @@ public class Execute
             archivo = new File (queriesFile);
             entrada = new FileReader (archivo);
             br = new BufferedReader(entrada);
-            String linea;
+            String linea="";
             
             while((linea=br.readLine())!=null) {
                 qDepotInitial.incFreqQuery(linea);

@@ -10,16 +10,18 @@ import java.util.HashMap;
  */
 public class QueryDepotTree implements QueryDepot 
 {
-    public HashMap<String,Trie<Query>> qDepot;
+    public HashMap<String,Trie<NodoTrie<Query>>> qDepot;
     public int num;
     
     /**
      * Constructor
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public QueryDepotTree() {
+	qDepot = new HashMap<String,Trie<NodoTrie<Query>>>();
 	String vocabulario = "abcdefghijklmnñopqrstuvwxyz";
 	for (int i=0;i<vocabulario.length();i++){
-	    qDepot.put(vocabulario.substring(i, i), new Trie<Query>(new NodoTrie<Query>(vocabulario.charAt(i),null),0));
+	    qDepot.put(vocabulario.substring(i, i+1), new Trie(new NodoTrie<Query>(vocabulario.charAt(i),new Query(vocabulario.substring(i, i+1))),0));
 	}
     }
 
@@ -37,8 +39,9 @@ public class QueryDepotTree implements QueryDepot
      */
     public int getFreqQuery (String q) {
 	String letterAux = q.substring(0,0);
-	Trie<Query> trieAux = qDepot.get(letterAux);
-	Query qAux = trieAux.buscar(q);
+	Trie<NodoTrie<Query>> trieAux = qDepot.get(letterAux);
+	NodoTrie<Query> nAux = trieAux.buscar(q);
+	Query qAux = nAux.buscar(q);
 	if (qAux == null){
 		return 0;
 	}
@@ -54,8 +57,15 @@ public class QueryDepotTree implements QueryDepot
      */
     public Lista<Query> listOfQueries (String prefix) {
 	String letterAux = prefix.substring(0,0);
-	Trie<Query> trieAux = qDepot.get(letterAux);
-	Lista<Query> listOfQueries = trieAux.buscarPorPrefijo(prefix);
+	Trie<NodoTrie<Query>> trieAux = qDepot.get(letterAux);
+	Lista<NodoTrie<Query>> listOfNodes = trieAux.buscarPorPrefijo(prefix);
+	Lista<Query> listOfQueries = new Lista<Query>();
+	for (int i=0;i<listOfNodes.darLongitud();i++){
+	    NodoTrie<Query> nAux = listOfNodes.darElemento(i);
+	    Query qAux = nAux.darElemento();
+	    listOfQueries.agregar(qAux);
+	}
+	 
 	return listOfQueries;
     }
 
@@ -64,21 +74,22 @@ public class QueryDepotTree implements QueryDepot
      * @param el texto de la consulta
      */
     public void incFreqQuery (String q) {
-	String letterAux = q.substring(0,0);
-	Trie<Query> trieAux = qDepot.get(letterAux);
-	Query qAux = trieAux.buscar(q);
-	if (qAux==null){
+	String letterAux = q.substring(0,1);
+	Trie<NodoTrie<Query>> trieAux = qDepot.get(letterAux);
+	NodoTrie<Query> nAux = trieAux.buscar(q);
+	//Query qAux = trieAux.buscar(q);
+	if (nAux==null){
 	    try {
-		trieAux.insertar(new Query(q));
+		trieAux.insertar(new NodoTrie<Query>(q.charAt(0),new Query(q)));
 	    } catch (ElementoExisteException e) {
-		// TODO Auto-generated catch block
+		System.out.println("El elemento ya existe");
 		e.printStackTrace();
 	    } catch (PalabraInvalidaException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
 	}else{
-	    trieAux.buscar(q).setQueryFreq(qAux.getQueryFreq()+1);
+	    trieAux.buscar(q).darElemento().setQueryFreq(nAux.darElemento().getQueryFreq()+1);
 	}
     }
 
@@ -90,11 +101,10 @@ public class QueryDepotTree implements QueryDepot
      */
     public void decFreqQuery (String q) {
 	String letterAux = q.substring(0,0);
-	Trie<Query> trieAux = qDepot.get(letterAux);
-	Query qAux = trieAux.buscar(q);
-	qAux.setQueryFreq(qAux.getQueryFreq()-1);
-	trieAux.buscar(q).setQueryFreq(qAux.getQueryFreq());
-	if (qAux.getQueryFreq()==0){
+	Trie<NodoTrie<Query>> trieAux = qDepot.get(letterAux);
+	NodoTrie<Query> nAux = trieAux.buscar(q);
+	nAux.darElemento().setQueryFreq(nAux.darElemento().getQueryFreq()-1);
+	if (nAux.darElemento().getQueryFreq()==0){
 	    try {
 		trieAux.eliminar(q);
 	    } catch (ElementoNoExisteException e) {

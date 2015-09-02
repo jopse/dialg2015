@@ -484,4 +484,10 @@ public class NodoTrie<T> implements Serializable
             }
         }
     }
+    @Override
+    public String toString(){
+	
+	return this.elemento.toString();
+	
+    }
 }
