@@ -38,14 +38,19 @@ public class QueryDepotTree implements QueryDepot
      * @param el texto de la consulta
      */
     public int getFreqQuery (String q) {
-	String letterAux = q.substring(0,0);
+	String letterAux = q.substring(0,1);
 	Trie<NodoTrie<Query>> trieAux = qDepot.get(letterAux);
 	NodoTrie<Query> nAux = trieAux.buscar(q);
-	Query qAux = nAux.buscar(q);
-	if (qAux == null){
+	Query qAux = null;
+	if (nAux != null){
+	    qAux = nAux.darElemento();
+	    if (qAux == null){
 		return 0;
+	    }
+	}else{
+	    return 0;
 	}
-	return qAux.getFreq();
+	return qAux.getQueryFreq();
     }
 
     /** Dado un prefijo de consulta, devuelve una lista, ordenada por
@@ -56,7 +61,7 @@ public class QueryDepotTree implements QueryDepot
      * @param el prefijo
      */
     public Lista<Query> listOfQueries (String prefix) {
-	String letterAux = prefix.substring(0,0);
+	String letterAux = prefix.substring(0,1);
 	Trie<NodoTrie<Query>> trieAux = qDepot.get(letterAux);
 	Lista<NodoTrie<Query>> listOfNodes = trieAux.buscarPorPrefijo(prefix);
 	Lista<Query> listOfQueries = new Lista<Query>();
@@ -91,6 +96,7 @@ public class QueryDepotTree implements QueryDepot
 	}else{
 	    trieAux.buscar(q).darElemento().setQueryFreq(nAux.darElemento().getQueryFreq()+1);
 	}
+	this.num=this.num+1;
     }
 
     /** Decrementa en uno la frecuencia de una consulta en el depósito

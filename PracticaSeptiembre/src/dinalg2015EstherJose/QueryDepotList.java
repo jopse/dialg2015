@@ -31,15 +31,16 @@ public class QueryDepotList implements QueryDepot
      * @returns la frecuencia de la consulta. Si no está, devolverá 0
      * @param el texto de la consulta */
     public int getFreqQuery (String q) {
+	iter = qDepot.darIterador();
 	int auxFreq=0;
 	while (iter.haySiguiente()){
 	    Query aux = iter.darSiguiente();
-	    if (aux.getText().compareTo(q)==0){
+	    if (aux.getText().compareTo(q) == 0){
 		auxFreq = aux.getFreq();
 		return auxFreq;
 	    }
 	}
-	iter.reiniciar();;
+	iter.reiniciar();
 	return auxFreq;        
     }
 
@@ -50,6 +51,7 @@ public class QueryDepotList implements QueryDepot
      * lexicográfico en caso de coincidencia de frecuencia
      * @param el prefijo */
     public Lista<Query> listOfQueries (String prefix) {
+	iter = qDepot.darIterador();
 	Lista<Query> listQuery = null;
 	listQuery = new Lista<Query>();
 	while (iter.haySiguiente()){
@@ -58,8 +60,6 @@ public class QueryDepotList implements QueryDepot
 		listQuery.agregar(aux);
 	    }
 	}
-	//ComparatorIF<Query> comparator = new ComparatorQuery<Query>();
-	//listQuery.sort(comparator);
 	iter.reiniciar();
 	return listQuery;
     }
@@ -68,14 +68,22 @@ public class QueryDepotList implements QueryDepot
      * Si la consulta no existía en la estructura, la deberá añadir
      * @param el texto de la consulta */
     public void incFreqQuery (String q) {
-        while (iter.haySiguiente()){
-            Query aux = iter.darSiguiente();
-            if (aux.getText().compareTo(q)==0){
-        	aux.setFreq(aux.getFreq()+1);
-            }else{
-        	qDepot.agregar(new Query(q));
-            }
-        }
+	iter = qDepot.darIterador();
+	if (qDepot.esVacio()){
+	    qDepot.agregar(new Query(q));
+	    return;
+	}else{
+	    while (iter.haySiguiente()){
+		Query aux = iter.darSiguiente();
+		if (aux.getText().compareTo(q)==0){
+		    aux.setFreq(aux.getFreq()+1);
+		    return;
+		}else{
+		    qDepot.agregar(new Query(q));
+		    return;
+		}
+	    }
+	}
         iter.reiniciar();
     }
 
@@ -85,6 +93,7 @@ public class QueryDepotList implements QueryDepot
      * @precondición la consulta debe estar ya en el depósito
      * @param el texto de la consulta */
     public void decFreqQuery (String q) {
+	iter = qDepot.darIterador();
         while (iter.haySiguiente()){
             Query aux = iter.darSiguiente();
             if (aux.getText().compareTo(q)==0){

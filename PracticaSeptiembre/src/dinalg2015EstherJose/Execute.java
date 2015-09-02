@@ -9,7 +9,7 @@ import java.io.*;
 public class Execute
 {
     public static QueryDepot qDepotInitial;
-    public static final int rep = 1;
+    public static final int rep = 10000000;
     
     public static void main(String[] args) throws ExcepArgs
     {
@@ -92,6 +92,7 @@ public class Execute
                     String qqS = "";
                     System.out.print("La lista de sugerencias para "+'"'+aa0[1]+'"'+" es:");
                     long tInicial = System.currentTimeMillis(); // almacena el tiempo inicial
+                    
                     for ( int cont = 0 ; cont < rep ; cont++ ) {
                         Lista<Query> qD = qDepotInitial.listOfQueries(aa0[1]);
                         Iterador<Query> it = qD.darIterador();
